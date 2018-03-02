@@ -9,14 +9,14 @@
                 <span id="capture-tip">请移动要捕捉的目标</span>
             </el-col>
         </el-row>
-        <el-row>
+        <el-row v-show="capturing">
             <el-col>
                 <v-m-jpeg :frame="videoFrame" id="video"></v-m-jpeg>
             </el-col>
         </el-row>
-        <el-row>
+        <el-row v-show="!capturing">
             <el-col>
-                <canvas ref="canvas"></canvas>
+                <canvas ref="canvas" id="canvas"></canvas>
             </el-col>
         </el-row>
     </div>
@@ -24,6 +24,7 @@
 <script>
     import config from '../config'
     import VMJpeg from '../components/VMJpeg.vue'
+    import {frame2base64} from '../utils/image'
     require('../message/request_pb');
     require('../message/response_pb');
 
@@ -61,7 +62,17 @@
                 reader.readAsArrayBuffer(e.data);
                 reader.onload = () => {
                     var frame = proto.FrameResponse.deserializeBinary(reader.result);
-                    me.videoFrame = frame.getFrame();
+                    if (frame.getType() == proto.FrameResponse.Type.VIDEO) {
+                        me.videoFrame = frame.getFrame();
+                    } else if(frame.getType() == proto.FrameResponse.Type.OUTLINE) {
+                        var img = new Image(), canvas = me.$refs.canvas, ctx = canvas.getContext('2d');
+                        img.src = frame2base64(frame.getFrame());
+                        img.onload = function () {
+                            canvas.width = img.naturalWidth;
+                            canvas.height = img.naturalHeight;
+                            ctx.drawImage(img, 0, 0);
+                        };
+                    }
                 };
             }
         }
@@ -75,8 +86,12 @@
     #video {
         padding: 10px;
     }
+    #canvas {
+        max-width: 100%;
+    }
     #capture-tip {
         color: darkgray;
         font-size: 20px;
+        line-height: 40px;
     }
 </style>

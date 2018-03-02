@@ -5,10 +5,11 @@
              unique-opened
              background-color="#545c64"
              text-color="#fff"
-             active-text-color="#ffd04b">
+             active-text-color="#ffd04b"
+             default-active="/">
         <el-menu-item index="/">目标提取</el-menu-item>
-        <el-menu-item index="/">目标追踪</el-menu-item>
-        <el-menu-item index="/">实时视频</el-menu-item>
+        <el-menu-item index="/track">目标追踪</el-menu-item>
+        <el-menu-item index="/video">实时视频</el-menu-item>
         <el-menu-item index="/about">关于</el-menu-item>
     </el-menu>
 </template>
