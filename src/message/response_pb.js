@@ -165,7 +165,8 @@ proto.FrameResponse.serializeBinaryToWriter = function(message, writer) {
  */
 proto.FrameResponse.Type = {
   VIDEO: 0,
-  OUTLINE: 1
+  OUTLINE: 1,
+  BACKGROUND: 2
 };
 
 /**
