@@ -4,13 +4,13 @@
     </div>
 </template>
 <script>
-    import {frame2base64} from '../utils/image'
+    import {bin2base64} from '../utils/image'
 
     export default{
         props: ['frame'],
         watch: {
             frame: function() {
-                this.$refs.img.src = frame2base64(this.frame);
+                this.$refs.img.src = bin2base64(this.frame);
             }
         }
     }

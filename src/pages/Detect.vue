@@ -9,14 +9,15 @@
                 <span id="capture-tip">请移动要捕捉的目标</span>
             </el-col>
         </el-row>
-        <el-row v-show="capturing">
+        <el-row v-show="capturing" class="capture">
             <el-col>
-                <v-m-jpeg :frame="videoFrame" id="video"></v-m-jpeg>
+                <v-m-jpeg :frame="videoFrame"></v-m-jpeg>
             </el-col>
         </el-row>
-        <el-row v-show="!capturing && outlineFrame">
+        <el-row v-show="!capturing && outlineFrame" class="capture">
             <el-col>
-                <v-clip-canvas :frame="outlineFrame" :background="backgroundFrame"></v-clip-canvas>
+                <v-clip-canvas :frame="outlineFrame" :background="backgroundFrame" @select="onOutlineSelect">
+                </v-clip-canvas>
             </el-col>
         </el-row>
     </div>
@@ -25,7 +26,7 @@
     import config from '../config'
     import VMJpeg from '../components/VMJpeg.vue'
     import VClipCanvas from '../components/VClipCanvas.vue'
-    import {frame2base64} from '../utils/image'
+    import {bin2base64} from '../utils/image'
     require('../message/request_pb');
     require('../message/response_pb');
 
@@ -74,7 +75,10 @@
                         me.backgroundFrame = frame.getFrame()
                     }
                 };
-            }
+            },
+            onOutlineSelect: function(img) {
+
+            },
         }
     }
 </script>
@@ -83,9 +87,6 @@
     #control-bar {
         padding: 10px 20px 16px 20px;
     }
-    #video {
-        padding: 10px;
-    }
     #canvas {
         max-width: 100%;
     }
@@ -93,5 +94,8 @@
         color: darkgray;
         font-size: 20px;
         line-height: 40px;
+    }
+    .capture {
+        padding: 10px;
     }
 </style>

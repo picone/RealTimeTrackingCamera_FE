@@ -2,7 +2,12 @@
  * Created by ChienHo on 2018/2/28.
  */
 
-exports.frame2base64 = function(frame) {
+/**
+ * 二进制字节流转data url
+ * @param frame
+ * @returns {string}
+ */
+exports.bin2base64 = function(frame) {
     if (!frame) {
         return;
     }
@@ -27,4 +32,21 @@ exports.frame2base64 = function(frame) {
         binary += String.fromCharCode(buffer[i]);
     }
     return 'data:' + mime + ';base64,' + window.btoa(binary);
+};
+
+/**
+ * data url转二进制字节流
+ * @param dataUrl
+ * @returns {Uint8Array}
+ */
+exports.base642bin = function(dataUrl) {
+    dataUrl = dataUrl.split(',');
+    if (dataUrl.length != 2) {
+        return new Uint8Array(0);
+    }
+    var buffer = new Uint8Array(dataUrl[1].length);
+    for (var i = 0; i < dataUrl[1].length; i++) {
+        buffer[i] = dataUrl[1].charCodeAt(i);
+    }
+    return buffer;
 };

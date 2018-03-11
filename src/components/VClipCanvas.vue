@@ -3,24 +3,24 @@
         <el-row>
             <el-col>
                 <img ref="background" id="background">
-                <canvas ref="canvas"
-                        id="canvas"
-                        @mouseup="onMouseUp"
-                        @mousedown="onMouseDown"
-                        @mousemove="onMouseMove">
+                <canvas ref="canvas" id="canvas" @mouseup="onMouseUp"
+                        @mousedown="onMouseDown" @mousemove="onMouseMove">
                 </canvas>
             </el-col>
         </el-row>
         <el-row>
-            <el-col>
-
+            <el-col :span="12">
+                <el-button type="success" @click="emitCanvasFrame" plain>确定</el-button>
+            </el-col>
+            <el-col :span="12">
+                <el-button type="danger" @click="setCanvasFrame" id="reset" plain>重置</el-button>
             </el-col>
         </el-row>
     </div>
 </template>
 
 <script>
-    import {frame2base64} from '../utils/image'
+    import {bin2base64, base642bin} from '../utils/image'
 
     export default{
         props: ['frame', 'background'],
@@ -28,36 +28,52 @@
             return {
                 mouseDown: false,
                 ctx: null,
+                frameImageData: null,
             }
         },
         watch: {
             frame: function() {
-                var img = new Image(), canvas = this.$refs.canvas, me = this;
-                img.src = frame2base64(this.frame);
-                img.onload = function () {
-                    canvas.width = img.naturalWidth;
-                    canvas.height = img.naturalHeight;
-//                    me.ctx.fillStyle = 'transparent';
-//                    me.ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight);
-//                    me.ctx.fillStyle = this.ctx.createPattern(img, 'no-repeat');
-//                    me.ctx.fillRect(0, 0, img.naturalWidth, img.naturalHeight)
-                    me.ctx.drawImage(img, 0, 0);
-                };
+                this.setCanvasFrame();
             },
             background: function () {
-                this.$refs.background.src = frame2base64(this.background);
+                this.$refs.background.src = bin2base64(this.background);
             }
         },
         mounted: function() {
             this.ctx = this.$refs.canvas.getContext('2d');
         },
         methods: {
+            setCanvasFrame: function() {
+                var img = new Image(), canvas = this.$refs.canvas, me = this;
+                img.src = bin2base64(this.frame);
+                img.onload = function() {
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    me.ctx.drawImage(img, 0, 0);
+                    me.frameImageData = me.ctx.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+                };
+            },
+            emitCanvasFrame: function() {
+                var canvas = this.$refs.canvas, maskImageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
+                if (this.frameImageData.width != maskImageData.width || this.frameImageData.height != maskImageData.height) {
+                    console.warn('canvas width or height changed');
+                    return;
+                }
+                // 把没有剪裁的区域置透明
+                for (var i = 0; i < maskImageData.data.length; i += 4) {
+                    if (maskImageData.data[i + 3] != 0) {
+                        this.frameImageData.data[i] = this.frameImageData.data[i + 1] = this.frameImageData.data[i + 2] = 255;
+                        this.frameImageData.data[i + 3] = 255;
+                    }
+                }
+                this.ctx.putImageData(this.frameImageData, 0, 0);
+                this.$emit('select', base642bin(this.$refs.canvas.toDataURL('image/jpeg')));
+            },
             onMouseDown: function(e) {
                 e.preventDefault();
                 this.mouseDown = true;
                 var p = this.getRealCoordinate({x: e.offsetX, y: e.offsetY});
                 this.ctx.save();
-                this.ctx.fillStyle = 'green';
                 this.ctx.beginPath();
                 this.ctx.moveTo(p.x, p.y);
             },
@@ -106,5 +122,8 @@
         position: absolute;
         left: 0;
         top: 0;
+    }
+    #reset {
+        float: right;
     }
 </style>
