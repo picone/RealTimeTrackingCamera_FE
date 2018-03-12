@@ -26,6 +26,7 @@
     import config from '../config'
     import VMJpeg from '../components/VMJpeg.vue'
     import VClipCanvas from '../components/VClipCanvas.vue'
+    import Dictionary from '../utils/dictionary'
     import {bin2base64} from '../utils/image'
     require('../message/request_pb');
     require('../message/response_pb');
@@ -74,10 +75,16 @@
                     } else if(frame.getType() == proto.FrameResponse.Type.BACKGROUND) {
                         me.backgroundFrame = frame.getFrame()
                     }
+                    if (me.outlineFrame && me.backgroundFrame) {
+                        me.ws.close();
+                        me.ws = null;
+                    }
                 };
             },
             onOutlineSelect: function(img) {
-
+                var dict = new Dictionary();
+                dict.set('contour_image', img);
+                this.$router.push('/track');
             },
         }
     }

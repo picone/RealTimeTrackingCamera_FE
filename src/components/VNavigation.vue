@@ -8,7 +8,6 @@
              active-text-color="#ffd04b"
              default-active="/">
         <el-menu-item index="/">目标提取</el-menu-item>
-        <el-menu-item index="/track">目标追踪</el-menu-item>
         <el-menu-item index="/video">实时视频</el-menu-item>
         <el-menu-item index="/about">关于</el-menu-item>
     </el-menu>

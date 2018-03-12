@@ -56,7 +56,8 @@ proto.CommandRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.CommandRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    code: jspb.Message.getFieldWithDefault(msg, 1, 0)
+    code: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    frame: msg.getFrame_asB64()
   };
 
   if (includeInstance) {
@@ -97,6 +98,10 @@ proto.CommandRequest.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {number} */ (reader.readInt32());
       msg.setCode(value);
       break;
+    case 16:
+      var value = /** @type {!Uint8Array} */ (reader.readBytes());
+      msg.setFrame(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -132,6 +137,13 @@ proto.CommandRequest.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getFrame_asU8();
+  if (f.length > 0) {
+    writer.writeBytes(
+      16,
+      f
+    );
+  }
 };
 
 
@@ -147,6 +159,45 @@ proto.CommandRequest.prototype.getCode = function() {
 /** @param {number} value */
 proto.CommandRequest.prototype.setCode = function(value) {
   jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional bytes frame = 16;
+ * @return {!(string|Uint8Array)}
+ */
+proto.CommandRequest.prototype.getFrame = function() {
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 16, ""));
+};
+
+
+/**
+ * optional bytes frame = 16;
+ * This is a type-conversion wrapper around `getFrame()`
+ * @return {string}
+ */
+proto.CommandRequest.prototype.getFrame_asB64 = function() {
+  return /** @type {string} */ (jspb.Message.bytesAsB64(
+      this.getFrame()));
+};
+
+
+/**
+ * optional bytes frame = 16;
+ * Note that Uint8Array is not supported on all browsers.
+ * @see http://caniuse.com/Uint8Array
+ * This is a type-conversion wrapper around `getFrame()`
+ * @return {!Uint8Array}
+ */
+proto.CommandRequest.prototype.getFrame_asU8 = function() {
+  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
+      this.getFrame()));
+};
+
+
+/** @param {!(string|Uint8Array)} value */
+proto.CommandRequest.prototype.setFrame = function(value) {
+  jspb.Message.setField(this, 16, value);
 };
 
 
