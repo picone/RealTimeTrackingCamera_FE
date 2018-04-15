@@ -9,12 +9,12 @@
  */
 exports.bin2base64 = function(frame) {
     if (!frame) {
-        return;
+        return '';
     }
     var buffer = new Uint8Array(frame);
     var buffer_length = buffer.length;
     if (buffer_length < 4) {
-        return;
+        return '';
     }
     //MIME判断
     var mime;
@@ -25,7 +25,7 @@ exports.bin2base64 = function(frame) {
     } else if (buffer[0] == 0x47 && buffer[1] == 0x49 && buffer[2] == 0x46) {
         mime = 'image/gif';
     } else {
-        return;
+        return '';
     }
     var binary = '';
     for (var i = 0; i < buffer_length; i++) {
@@ -44,9 +44,9 @@ exports.base642bin = function(dataUrl) {
     if (dataUrl.length != 2) {
         return new Uint8Array(0);
     }
-    var buffer = new Uint8Array(dataUrl[1].length);
-    for (var i = 0; i < dataUrl[1].length; i++) {
-        buffer[i] = dataUrl[1].charCodeAt(i);
+    var binaryString = window.atob(dataUrl[1]), bufferLen = binaryString.length, buffer = new Uint8Array(bufferLen);
+    for (var i = 0; i < bufferLen; i++) {
+        buffer[i] = binaryString.charCodeAt(i);
     }
     return buffer;
 };

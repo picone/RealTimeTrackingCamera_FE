@@ -2,7 +2,8 @@
     <div>
         <el-row>
             <el-col>
-                <img ref="background" id="background">
+                <canvas ref="background" id="background">
+                </canvas>
                 <canvas ref="canvas" id="canvas" @mouseup="onMouseUp"
                         @mousedown="onMouseDown" @mousemove="onMouseMove">
                 </canvas>
@@ -13,7 +14,7 @@
                 <el-button type="success" @click="emitCanvasFrame" plain>确定</el-button>
             </el-col>
             <el-col :span="12">
-                <el-button type="danger" @click="setCanvasFrame" id="reset" plain>重置</el-button>
+                <el-button type="danger" @click="setForeground" id="reset" plain>重置</el-button>
             </el-col>
         </el-row>
     </div>
@@ -28,45 +29,52 @@
             return {
                 mouseDown: false,
                 ctx: null,
-                frameImageData: null,
             }
         },
         watch: {
             frame: function() {
-                this.setCanvasFrame();
+                this.setForeground();
             },
             background: function () {
-                this.$refs.background.src = bin2base64(this.background);
+                this.setBackground();
             }
         },
         mounted: function() {
             this.ctx = this.$refs.canvas.getContext('2d');
         },
         methods: {
-            setCanvasFrame: function() {
-                var img = new Image(), canvas = this.$refs.canvas, me = this;
-                img.src = bin2base64(this.frame);
+            setForeground: function () {
+                this.setCanvasFrame(this.$refs.canvas, this.frame);
+            },
+            setBackground: function () {
+                this.setCanvasFrame(this.$refs.background, this.background);
+            },
+            setCanvasFrame: function(canvas, frame) {
+                var img = new Image(), ctx = canvas.getContext('2d');
+                img.src = bin2base64(frame);
                 img.onload = function() {
                     canvas.width = img.naturalWidth;
                     canvas.height = img.naturalHeight;
-                    me.ctx.drawImage(img, 0, 0);
-                    me.frameImageData = me.ctx.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+                    ctx.drawImage(img, 0, 0);
                 };
             },
             emitCanvasFrame: function() {
-                var canvas = this.$refs.canvas, maskImageData = this.ctx.getImageData(0, 0, canvas.width, canvas.height);
-                if (this.frameImageData.width != maskImageData.width || this.frameImageData.height != maskImageData.height) {
+                var background = this.$refs.background,
+                    backgroundCtx = background.getContext('2d'),
+                    backgroundImageData = backgroundCtx.getImageData(0, 0, background.width, background.height),
+                    maskImageData = this.ctx.getImageData(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+                if (backgroundImageData.width != maskImageData.width || backgroundImageData.height != maskImageData.height) {
                     console.warn('canvas width or height changed');
                     return;
                 }
                 // 把没有剪裁的区域置透明
                 for (var i = 0; i < maskImageData.data.length; i += 4) {
                     if (maskImageData.data[i + 3] != 0) {
-                        this.frameImageData.data[i] = this.frameImageData.data[i + 1] = this.frameImageData.data[i + 2] = 255;
-                        this.frameImageData.data[i + 3] = 255;
+                        backgroundImageData.data[i] = backgroundImageData.data[i + 1] = backgroundImageData.data[i + 2] = 255;
+                        backgroundImageData.data[i + 3] = 255;
                     }
                 }
-                this.ctx.putImageData(this.frameImageData, 0, 0);
+                this.ctx.putImageData(backgroundImageData, 0, 0);
                 this.$emit('select', base642bin(this.$refs.canvas.toDataURL('image/jpeg')));
             },
             onMouseDown: function(e) {

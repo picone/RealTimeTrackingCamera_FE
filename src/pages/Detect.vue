@@ -43,6 +43,7 @@
         },
         beforeDestroy() {
             if (this.ws) {
+                this.stopListenWebsocket();
                 this.ws.close();
             }
         },
