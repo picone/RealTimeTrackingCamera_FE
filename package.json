@@ -13,6 +13,7 @@
     "element-ui": "^2.2.0",
     "google-protobuf": "^3.5.0",
     "vue": "^2.5.11",
+    "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1"
   },
   "browserslist": [
@@ -28,6 +29,7 @@
     "babel-preset-stage-3": "^6.24.1",
     "css-loader": "^0.28.10",
     "file-loader": "^1.1.10",
+    "text-loader": "^0.0.1",
     "vue-loader": "^13.0.5",
     "vue-template-compiler": "^2.4.4",
     "webpack": "^3.6.0"
